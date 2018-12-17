@@ -11,52 +11,52 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 
-
 class XsltExporter(
-    val xsltFile: Path,
-    val outFile: Path
+    private val xsltFile: Path,
+    private val outFile: Path
 ) : Exporter {
-
     private val logger = KotlinLogging.logger {}
 
-
     override fun export(obj: Any) {
+        logger.debug { "Retrieving XML source..." }
         val xmlExporter = XmlExporter()
         xmlExporter.export(obj)
-        val xml = xmlExporter.xml
 
-        val result = try {
+        val xmlRaw = xmlExporter.xml
+        val xml = if (!xmlRaw.isEmpty()) {
+            xmlRaw
+        } else {
+            throw Exception("XML must not be empty")
+        }
 
-            val stringReader = StringReader(xml)
+        val xsltResult = transform(xml)
 
-            val stylesheet = xsltFile.toFile()
-            //val xmlfile = File("D://employees.xml")
-            val stylesource = StreamSource(stylesheet)
-            val xmlsource = StreamSource(stringReader)
+        logger.debug { "Writing output to '$outFile'..." }
+        outFile.toFile().writeText(xsltResult)
+    }
+
+    private fun transform(xml: String): String {
+        logger.debug { "Transforming XML via XSL-T..." }
+
+        return try {
+            val xmlStringreader = StringReader(xml)
+
+            val xsltStylesheet = xsltFile.toFile()
+            val stylesheetSource = StreamSource(xsltStylesheet)
+            val xmlSource = StreamSource(xmlStringreader)
             val transformer = TransformerFactory.newInstance()
-                .newTransformer(stylesource)
+                .newTransformer(stylesheetSource)
 
+            val xsltResultStringwriter = StringWriter()
+            transformer.transform(xmlSource, StreamResult(xsltResultStringwriter))
 
-            val stringwriter = StringWriter()
+            val xsltResult = xsltResultStringwriter.toString()
+            xsltResultStringwriter.close()
 
-            // Transform the document and store it in a file
-            transformer.transform(xmlsource, StreamResult(stringwriter))
-
-            //val consoleOut = StreamResult(System.out)
-            // Transform the document and print the content to console
-            //transformer.transform(xmlsource, consoleOut)
-
-            val s = stringwriter.toString()
-            stringwriter.close()
-
-            s
+            xsltResult
         } catch (e: TransformerException) {
             logger.error(e) { }
             throw e
         }
-
-        outFile.toFile().writeText(result)
-
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

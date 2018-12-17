@@ -30,7 +30,7 @@ class OdbImporter(odbPath: Path) : Importer {
             Files.move(it.toPath(), it.toPath().resolveSibling("database.${it.name}"))
         }
 
-        hsqldbImporter = HsqldbImporter(databasePath)
+        hsqldbImporter = HsqldbImporter(databasePath.toPath())
     }
 
     override val positions: List<Position>
