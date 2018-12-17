@@ -39,13 +39,14 @@ class HsqldbImporter(val hsqldbPath: File) : Importer {
 
                 // Loop through the data and print all artist names
                 while (rs.next()) {
+                    logger.debug { "Reading next position from database..." }
                     positions.add(
                         Position(
                             rs.getString("id").toInt(),
                             rs.getString("positiontitle"),
                             rs.getString("description"),
                             LocalDate.parse(rs.getString("begindate")),
-                            LocalDate.parse(rs.getString("enddate")),
+                            if (rs.getString("enddate").isNullOrBlank()) null else LocalDate.parse(rs.getString("enddate")),
                             rs.getString("place"),
                             rs.getString("placeurl"),
                             rs.getString("category")

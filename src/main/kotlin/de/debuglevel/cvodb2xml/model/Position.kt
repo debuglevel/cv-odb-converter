@@ -7,7 +7,7 @@ data class Position(
     val title: String,
     val description: String,
     val begin: LocalDate,
-    val end: LocalDate,
+    val end: LocalDate?,
     val place: String,
     val placeUrl: String,
     val category: String
