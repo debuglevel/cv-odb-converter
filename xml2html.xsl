@@ -3,7 +3,7 @@
         <div class="resume-item d-flex flex-column flex-md-row mb-5">
             <div class="resume-content mr-auto">
                 <h3 class="mb-0">
-                    <xsl:value-of select="title"/>
+                    <xsl:value-of select="activity"/>
                 </h3>
                 <div class="subheading mb-3">
                     <a>
@@ -11,7 +11,23 @@
                             <xsl:value-of select="placeUrl"/>
                         </xsl:attribute>
                         <xsl:value-of select="place"/>
-                    </a>
+                    </a><!--<xsl:choose>
+                    <xsl:when test="department">, <xsl:value-of select="department"/></xsl:when>
+                    </xsl:choose>-->
+                    <xsl:choose>
+                        <xsl:when test="industrialSector/text()">(<xsl:value-of select="industrialSector"/>)
+                        </xsl:when>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="placeSize/text()">,
+                            <xsl:value-of select="placeSize"/> Mitarbeiter
+                        </xsl:when>
+                    </xsl:choose>
+                    <xsl:choose>
+                        <xsl:when test="title/text()">,
+                            <xsl:value-of select="title"/>
+                        </xsl:when>
+                    </xsl:choose>
                 </div>
                 <p>
                     <xsl:value-of select="description"/>
@@ -22,13 +38,10 @@
                     <xsl:value-of select="format-number(begin/monthValue, '00')"/>/<xsl:value-of select="begin/year"/>
                     bis
                     <xsl:choose>
-                        <xsl:when test="end/year">
-                            <xsl:value-of select="format-number(end/monthValue, '00')"/>/<xsl:value-of
+                        <xsl:when test="end/year"><xsl:value-of select="format-number(end/monthValue, '00')"/>/<xsl:value-of
                                 select="end/year"/>
                         </xsl:when>
-                        <xsl:otherwise>
-                            heute
-                        </xsl:otherwise>
+                        <xsl:otherwise>heute</xsl:otherwise>
                     </xsl:choose>
                 </span>
             </div>

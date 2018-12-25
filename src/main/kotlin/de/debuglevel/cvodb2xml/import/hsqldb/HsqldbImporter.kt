@@ -47,7 +47,11 @@ class HsqldbImporter(private val hsqldbPath: Path) : Importer {
                             ),
                             resultset.getString("place"),
                             resultset.getString("placeurl"),
-                            resultset.getString("category")
+                            resultset.getString("category"),
+                            resultset.getString("industrialsector"),
+                            resultset.getString("placesize"),
+                            resultset.getString("department"),
+                            resultset.getString("activity")
                         )
                     )
                 }
