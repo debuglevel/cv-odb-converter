@@ -29,9 +29,9 @@
                         </xsl:when>
                     </xsl:choose>
                 </div>
-                <p>
-                    <xsl:value-of select="description"/>
-                </p>
+                <!-- <p> -->
+                <xsl:value-of select="description" disable-output-escaping="yes"/>
+                <!-- </p> -->
             </div>
             <div class="resume-date text-md-right">
                 <span class="text-primary">

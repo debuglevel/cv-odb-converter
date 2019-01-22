@@ -25,6 +25,9 @@ dependencies {
 
     compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '9.9.0-2'
 
+    // Markdown parser
+    compile group: 'com.github.rjeschke', name: 'txtmark', version: '0.13'
+
 }
 
 compileKotlin {

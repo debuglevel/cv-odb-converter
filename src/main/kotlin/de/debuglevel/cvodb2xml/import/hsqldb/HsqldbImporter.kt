@@ -1,5 +1,6 @@
 package de.debuglevel.cvodb2xml.import.hsqldb
 
+import com.github.rjeschke.txtmark.Processor
 import de.debuglevel.cvodb2xml.import.Importer
 import de.debuglevel.cvodb2xml.model.Position
 import mu.KotlinLogging
@@ -38,7 +39,7 @@ class HsqldbImporter(private val hsqldbPath: Path) : Importer {
                         Position(
                             resultset.getString("id").toInt(),
                             resultset.getString("positiontitle"),
-                            resultset.getString("description"),
+                            Processor.process(resultset.getString("description")),
                             LocalDate.parse(resultset.getString("begindate")),
                             if (resultset.getString("enddate").isNullOrBlank()) null else LocalDate.parse(
                                 resultset.getString(
