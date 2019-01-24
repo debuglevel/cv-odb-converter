@@ -1,5 +1,14 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.11'
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version "1.3.11"
+
+    // create start scripts
+    // is executed on "build" task but not on e.g. "jar" task
+    id 'application'
+
+    // bundle all dependencies into one fat shadowed jar
+    // (gets automatically triggered when application plugin is present)
+    id 'com.github.johnrengelman.shadow' version '4.0.3'
 }
 
 group 'de.debuglevel.cvodb2xml'
@@ -8,6 +17,10 @@ version '0.0.1-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+
+// application plugin configuration
+applicationName = "CV odb2xml"
+mainClassName = "de.debuglevel.cvodb2xml.MainKt"
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
@@ -28,6 +41,8 @@ dependencies {
     // Markdown parser
     compile group: 'com.github.rjeschke', name: 'txtmark', version: '0.13'
 
+    // CLI Options parser
+    compile 'com.github.ajalt:clikt:1.6.0'
 }
 
 compileKotlin {
@@ -35,4 +50,13 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+// jar configuration is still needed (despite of application plugin) to add Manifest to traditional jar
+jar {
+    manifest {
+        attributes 'Implementation-Title': applicationName,
+                'Implementation-Version': version,
+                'Main-Class': mainClassName
+    }
 }
