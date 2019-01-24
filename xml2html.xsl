@@ -15,18 +15,13 @@
                     <xsl:when test="department">, <xsl:value-of select="department"/></xsl:when>
                     </xsl:choose>-->
                     <xsl:choose>
-                        <xsl:when test="industrialSector/text()">(<xsl:value-of select="industrialSector"/>)
-                        </xsl:when>
+                        <xsl:when test="industrialSector/text()"> (<xsl:value-of select="industrialSector"/>)</xsl:when>
                     </xsl:choose>
                     <xsl:choose>
-                        <xsl:when test="placeSize/text()">,
-                            <xsl:value-of select="placeSize"/> Mitarbeiter
-                        </xsl:when>
+                        <xsl:when test="placeSize/text()">, <xsl:value-of select="placeSize"/> Mitarbeiter</xsl:when>
                     </xsl:choose>
                     <xsl:choose>
-                        <xsl:when test="title/text()">,
-                            <xsl:value-of select="title"/>
-                        </xsl:when>
+                        <xsl:when test="title/text()">, <xsl:value-of select="title"/></xsl:when>
                     </xsl:choose>
                 </div>
                 <!-- <p> -->
@@ -35,12 +30,8 @@
             </div>
             <div class="resume-date text-md-right">
                 <span class="text-primary">
-                    <xsl:value-of select="format-number(begin/monthValue, '00')"/>/<xsl:value-of select="begin/year"/>
-                    bis
-                    <xsl:choose>
-                        <xsl:when test="end/year"><xsl:value-of select="format-number(end/monthValue, '00')"/>/<xsl:value-of
-                                select="end/year"/>
-                        </xsl:when>
+                    <xsl:value-of select="format-number(begin/monthValue, '00')"/>/<xsl:value-of select="begin/year"/> bis <xsl:choose>
+                        <xsl:when test="end/year"><xsl:value-of select="format-number(end/monthValue, '00')"/>/<xsl:value-of select="end/year"/></xsl:when>
                         <xsl:otherwise>heute</xsl:otherwise>
                     </xsl:choose>
                 </span>
