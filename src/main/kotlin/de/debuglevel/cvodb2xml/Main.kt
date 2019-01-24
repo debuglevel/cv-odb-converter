@@ -33,6 +33,9 @@ class Main {
 
         val xsltResult = XsltExporter().export(xml, Paths.get("xml2html.xsl"))
         File("Lebenslauf.html").writeText(xsltResult)
+
+        val html = File("replacement-template.html").readText().replace("<!-- XSLT input -->", xsltResult)
+        File("index.html").writeText(html)
     }
 }
 
