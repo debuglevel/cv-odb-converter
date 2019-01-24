@@ -30,7 +30,7 @@
             </div>
             <div class="resume-date text-md-right">
                 <span class="text-primary">
-                    <xsl:value-of select="format-number(begin/monthValue, '00')"/>/<xsl:value-of select="begin/year"/> bis <xsl:choose>
+                    <xsl:value-of select="format-number(begin/monthValue, '00')"/>/<xsl:value-of select="begin/year"/>&#160;bis&#160;<xsl:choose>
                         <xsl:when test="end/year"><xsl:value-of select="format-number(end/monthValue, '00')"/>/<xsl:value-of select="end/year"/></xsl:when>
                         <xsl:otherwise>heute</xsl:otherwise>
                     </xsl:choose>
