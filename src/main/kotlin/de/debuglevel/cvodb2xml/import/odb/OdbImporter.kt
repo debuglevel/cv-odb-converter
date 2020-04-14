@@ -3,6 +3,7 @@ package de.debuglevel.cvodb2xml.import.odb
 import com.github.rjeschke.txtmark.Processor
 import de.debuglevel.cvodb2xml.import.Importer
 import de.debuglevel.cvodb2xml.model.Position
+import de.debuglevel.cvodb2xml.model.Skill
 import mu.KotlinLogging
 import java.nio.file.Path
 import java.sql.Connection
@@ -77,5 +78,54 @@ class OdbImporter(private val odbPath: Path) : Importer {
             }
 
             return positions
+        }
+
+    override val skills: List<Skill>
+        get() {
+            val databasePath = odbPath.toFile().invariantSeparatorsPath
+
+            var connection: Connection? = null
+            val database = "jdbc:odb://file=$databasePath"
+
+            val skills = mutableListOf<Skill>()
+
+            try {
+                // Create database connection
+                logger.debug { "Opening connection to $database..." }
+                connection = DriverManager.getConnection(database)
+
+                // Create and execute statement
+                val statement = connection.createStatement()
+                val resultset = statement.executeQuery("SELECT * FROM \"PUBLIC\".\"Fähigkeiten\"")
+
+                while (resultset.next()) {
+                    logger.debug { "Reading next skill from database..." }
+                    skills.add(
+                        Skill(
+                            resultset.getString("id").toInt(),
+                            resultset.getString("category"),
+                            resultset.getString("level"),
+                            resultset.getString("label"),
+                            resultset.getString("description"),
+                            resultset.getString("subcategory")
+                        )
+                    )
+                }
+
+                resultset.close()
+                statement.close()
+            } catch (e: SQLException) {
+                logger.error(e) { }
+                throw e
+            } finally {
+                try {
+                    connection?.close()
+                } catch (e: SQLException) {
+                    logger.error(e) { }
+                    throw e
+                }
+            }
+
+            return skills
         }
 }
