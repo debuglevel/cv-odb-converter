@@ -86,9 +86,16 @@ class Main : CliktCommand() {
                     it.category
                 }
                     .thenBy { it.subcategory }
-                    .thenBy { it.level }
+                    .thenBy {
+                        when (it.level) {
+                            "high" -> 1
+                            "medium" -> 2
+                            "low" -> 3
+                            else -> 0
+                        }
+                    }
                     .thenBy { it.label }
-                    .reversed())
+            )
 
         val xmlPositions = XmlExporter().export(positions)
         File("temp-positions.xml").writeText(xmlPositions)
