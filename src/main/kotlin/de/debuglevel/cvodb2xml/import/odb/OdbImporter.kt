@@ -41,26 +41,26 @@ class OdbImporter(private val odbPath: Path) : Importer {
 
                 while (resultset.next()) {
                     logger.debug { "Reading next position from database..." }
-                    positions.add(
-                        Position(
-                            resultset.getString("id").toInt(),
-                            resultset.getString("positiontitle"),
-                            Processor.process(resultset.getString("description")),
-                            LocalDate.parse(resultset.getString("begindate")),
-                            if (resultset.getString("enddate").isNullOrBlank()) null else LocalDate.parse(
-                                resultset.getString(
-                                    "enddate"
-                                )
-                            ),
-                            resultset.getString("place"),
-                            resultset.getString("placeurl"),
-                            resultset.getString("category"),
-                            resultset.getString("industrialsector"),
-                            resultset.getString("placesize"),
-                            resultset.getString("department"),
-                            resultset.getString("activity")
-                        )
+                    val position = Position(
+                        resultset.getString("id").toInt(),
+                        resultset.getString("positiontitle"),
+                        Processor.process(resultset.getString("description")),
+                        LocalDate.parse(resultset.getString("begindate")),
+                        if (resultset.getString("enddate").isNullOrBlank()) null else LocalDate.parse(
+                            resultset.getString(
+                                "enddate"
+                            )
+                        ),
+                        resultset.getString("place"),
+                        resultset.getString("placeurl"),
+                        resultset.getString("category"),
+                        resultset.getString("industrialsector"),
+                        resultset.getString("placesize"),
+                        resultset.getString("department"),
+                        resultset.getString("activity")
                     )
+                    positions.add(position)
+                    logger.debug { "Added position: $position" }
                 }
 
                 resultset.close()
@@ -100,16 +100,16 @@ class OdbImporter(private val odbPath: Path) : Importer {
 
                 while (resultset.next()) {
                     logger.debug { "Reading next skill from database..." }
-                    skills.add(
-                        Skill(
-                            resultset.getString("id").toInt(),
-                            resultset.getString("category"),
-                            resultset.getString("level"),
-                            resultset.getString("label"),
-                            resultset.getString("description"),
-                            resultset.getString("subcategory")
-                        )
+                    val skill = Skill(
+                        resultset.getString("id").toInt(),
+                        resultset.getString("category"),
+                        resultset.getString("level"),
+                        resultset.getString("label"),
+                        resultset.getString("description"),
+                        resultset.getString("subcategory")
                     )
+                    skills.add(skill)
+                    logger.debug { "Added skill: $skill" }
                 }
 
                 resultset.close()
