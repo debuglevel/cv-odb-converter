@@ -4,6 +4,7 @@ import com.github.rjeschke.txtmark.Processor
 import de.debuglevel.cvodb2xml.import.Importer
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
+import de.debuglevel.cvodb2xml.model.SkillComparison
 import mu.KotlinLogging
 import java.nio.file.Path
 import java.sql.Connection
@@ -127,5 +128,56 @@ class OdbImporter(private val odbPath: Path) : Importer {
             }
 
             return skills
+        }
+
+    override val skillComparisons: List<SkillComparison>
+        get() {
+            val skills = this.skills
+
+            val databasePath = odbPath.toFile().invariantSeparatorsPath
+
+            var connection: Connection? = null
+            val database = "jdbc:odb://file=$databasePath"
+
+            val skillComparisons = mutableListOf<SkillComparison>()
+
+            try {
+                // Create database connection
+                logger.debug { "Opening connection to $database..." }
+                connection = DriverManager.getConnection(database)
+
+                // Create and execute statement
+                val statement = connection.createStatement()
+                val resultset = statement.executeQuery("SELECT * FROM \"PUBLIC\".\"SkillVergleich\"")
+
+                while (resultset.next()) {
+                    logger.debug { "Reading next skill comparison from database..." }
+                    val betterSkillId = resultset.getString("better_skill").toInt()
+                    val worseSkillId = resultset.getString("worse_skill").toInt()
+                    val skillComparison = SkillComparison(
+                        betterSkillId,
+                        worseSkillId,
+                        skills.single { it.id == betterSkillId },
+                        skills.single { it.id == worseSkillId }
+                    )
+                    skillComparisons.add(skillComparison)
+                    logger.debug { "Added skill comparison: $skillComparison" }
+                }
+
+                resultset.close()
+                statement.close()
+            } catch (e: SQLException) {
+                logger.error(e) { }
+                throw e
+            } finally {
+                try {
+                    connection?.close()
+                } catch (e: SQLException) {
+                    logger.error(e) { }
+                    throw e
+                }
+            }
+
+            return skillComparisons
         }
 }
