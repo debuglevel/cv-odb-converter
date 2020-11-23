@@ -13,6 +13,7 @@ import de.debuglevel.cvodb2xml.import.odb.OdbImporter
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
 import de.debuglevel.graphlibrary.GraphBuilder
+import de.debuglevel.graphlibrary.GraphUtils
 import de.debuglevel.graphlibrary.export.DotExporter
 import de.debuglevel.graphlibrary.export.GraphvizExporter
 import guru.nidi.graphviz.engine.Format
@@ -122,6 +123,9 @@ class Main : CliktCommand() {
         val graph = GraphBuilder<Skill>(SkillNodeInformationRetriever(skillComparisons)).build(skills, false)
         val dot = DotExporter.generate(graph)
         GraphvizExporter.render(dot, File("skills.svg"), Format.SVG)
+
+        GraphUtils.populateOrders(graph)
+        graph.getVertices().sortedBy { it.order }.forEach { println("${it.scaledOrder} ${it.text}") }
     }
 }
 

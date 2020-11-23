@@ -56,7 +56,7 @@ dependencies {
     compile 'com.github.ajalt:clikt:1.6.0'
 
     // Graph Library
-    implementation 'com.github.debuglevel:java-graph-library:main-8383020ec0-1' // TODO: replace by release once it is available
+    implementation 'com.github.debuglevel:java-graph-library:main-248a8403b3-1' // TODO: replace by release once it is available
     // GraphViz
     implementation 'guru.nidi:graphviz-java:0.8.8'
 }

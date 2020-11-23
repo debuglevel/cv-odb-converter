@@ -13,6 +13,10 @@ class SkillNodeInformationRetriever(
 ) : NodeInformationRetriever<Skill> {
     private val logger = KotlinLogging.logger {}
 
+    override fun getText(node: Skill): String {
+        return node.label
+    }
+
     override fun getColor(node: Skill): Color {
         return Color.Gray
     }
