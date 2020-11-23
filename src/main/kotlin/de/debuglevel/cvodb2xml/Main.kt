@@ -105,27 +105,44 @@ class Main : CliktCommand() {
 
         val skillComparisons = importer.skillComparisons
 
+        // experimental visualization of skill comparisons
+        val graph = GraphBuilder<Skill>(SkillNodeInformationRetriever(skillComparisons)).build(skills, false)
+        val dot = DotExporter.generate(graph)
+        GraphvizExporter.render(dot, File("skills.svg"), Format.SVG)
+        GraphUtils.findCycles(graph) // TODO: this should stop the whole tool if a cycle was found
+
+        GraphUtils.populateOrders(graph)
+        // set orders according to scaled orders in graph
+        graph.getVertices().forEach { vertex ->
+            skills.first { skill -> skill == vertex.content }.order = vertex.scaledOrder
+        }
+        graph.getVertices().sortedBy { it.order }.forEach { println("${it.scaledOrder} ${it.text}") }
+
+        val orderedSkills = skills
+            .sortedWith(
+                compareBy<Skill>
+                {
+                    it.category
+                }
+                    .thenBy { it.subcategory }
+                    .thenByDescending { it.order }
+                    .thenBy { it.label }
+            )
+
+        // produce HTML by serializing XML and converting it via XSL-T
         val xmlPositions = XmlExporter().export(positions)
         File("temp-positions.xml").writeText(xmlPositions)
         val xsltPositionsResult = XsltExporter().export(xmlPositions, positionsXsltPath)
         File("temp-positions.html").writeText(xsltPositionsResult)
         html = html.replace("<!-- XSL-T positions placeholder -->", xsltPositionsResult)
 
-        val xmlSkills = XmlExporter().export(skills)
+        val xmlSkills = XmlExporter().export(orderedSkills)
         File("temp-skills.xml").writeText(xmlSkills)
         val xsltSkillsResult = XsltExporter().export(xmlSkills, skillsXsltPath)
         File("temp-skills.html").writeText(xsltSkillsResult)
         html = html.replace("<!-- XSL-T skills placeholder -->", xsltSkillsResult)
 
         outputPath.toFile().writeText(html)
-
-        // experimental visualization of skill comparisons
-        val graph = GraphBuilder<Skill>(SkillNodeInformationRetriever(skillComparisons)).build(skills, false)
-        val dot = DotExporter.generate(graph)
-        GraphvizExporter.render(dot, File("skills.svg"), Format.SVG)
-
-        GraphUtils.populateOrders(graph)
-        graph.getVertices().sortedBy { it.order }.forEach { println("${it.scaledOrder} ${it.text}") }
     }
 }
 
