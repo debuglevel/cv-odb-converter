@@ -7,10 +7,15 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
 import de.debuglevel.cvodb2xml.export.xml.XmlExporter
 import de.debuglevel.cvodb2xml.export.xslt.XsltExporter
+import de.debuglevel.cvodb2xml.graph.SkillNodeInformationRetriever
 import de.debuglevel.cvodb2xml.import.Importer
 import de.debuglevel.cvodb2xml.import.odb.OdbImporter
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
+import de.debuglevel.graphlibrary.GraphBuilder
+import de.debuglevel.graphlibrary.export.DotExporter
+import de.debuglevel.graphlibrary.export.GraphvizExporter
+import guru.nidi.graphviz.engine.Format
 import mu.KotlinLogging
 import java.io.File
 import java.nio.file.Paths
@@ -97,6 +102,8 @@ class Main : CliktCommand() {
                     .thenBy { it.label }
             )
 
+        val skillComparisons = importer.skillComparisons
+
         val xmlPositions = XmlExporter().export(positions)
         File("temp-positions.xml").writeText(xmlPositions)
         val xsltPositionsResult = XsltExporter().export(xmlPositions, positionsXsltPath)
@@ -110,6 +117,11 @@ class Main : CliktCommand() {
         html = html.replace("<!-- XSL-T skills placeholder -->", xsltSkillsResult)
 
         outputPath.toFile().writeText(html)
+
+        // experimental visualization of skill comparisons
+        val graph = GraphBuilder<Skill>(SkillNodeInformationRetriever(skillComparisons)).build(skills, false)
+        val dot = DotExporter.generate(graph)
+        GraphvizExporter.render(dot, File("skills.svg"), Format.SVG)
     }
 }
 

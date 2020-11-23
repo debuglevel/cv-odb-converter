@@ -7,4 +7,8 @@ data class Skill(
     val label: String,
     val description: String?,
     val subcategory: String?
-)
+) {
+    override fun toString(): String {
+        return label
+    }
+}

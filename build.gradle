@@ -19,6 +19,12 @@ repositories {
     maven {
         url "https://dl.bintray.com/debuglevel/maven"
     }
+    maven {
+        url 'https://jitpack.io'
+        metadataSources { // TODO: remove this as soon as a release of java-graph-library exists
+            artifact() // workaround to specify git hash as jitpack version
+        }
+    }
 }
 
 // application plugin configuration
@@ -48,6 +54,11 @@ dependencies {
 
     // CLI Options parser
     compile 'com.github.ajalt:clikt:1.6.0'
+
+    // Graph Library
+    implementation 'com.github.debuglevel:java-graph-library:main-8383020ec0-1' // TODO: replace by release once it is available
+    // GraphViz
+    implementation 'guru.nidi:graphviz-java:0.8.8'
 }
 
 compileKotlin {
