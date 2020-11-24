@@ -3,6 +3,7 @@ package de.debuglevel.cvodb2xml
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
 import de.debuglevel.cvodb2xml.export.xml.XmlExporter
@@ -68,24 +69,47 @@ class Main : CliktCommand() {
         readable = false
     ).default(Paths.get("index.html"))
 
-    override fun run() {
-        var html = templatePath.toFile().readText()
+    private val calculateSkillOrders by option(
+        "--calculate-skill-orders",
+        help = "Calculate skill orders defined by skill comparisons"
+    ).flag(default = false)
 
+    override fun run() {
         val importer: Importer = OdbImporter(odbPath)
 
-        val positions = importer.positions
-            .sortedWith(
-                compareBy<Position>
-                {
-                    when (it.end) {
-                        null -> LocalDate.now()
-                        else -> it.end
-                    }
-                }
-                    .thenBy { it.begin }
-                    .reversed())
+        val positions = getPositions(importer)
+        val skills = getSkills(importer, calculateSkillOrders)
 
-        val skills = importer.skills
+        generateHtml(positions, skills)
+    }
+
+    private fun generateHtml(
+        positions: List<Position>,
+        skills: List<Skill>
+    ) {
+        // produce HTML by serializing XML and converting it via XSL-T
+        var html = templatePath.toFile().readText()
+
+        val xmlPositions = XmlExporter().export(positions)
+        File("temp-positions.xml").writeText(xmlPositions)
+        val xsltPositionsResult = XsltExporter().export(xmlPositions, positionsXsltPath)
+        File("temp-positions.html").writeText(xsltPositionsResult)
+        html = html.replace("<!-- XSL-T positions placeholder -->", xsltPositionsResult)
+
+        val xmlSkills = XmlExporter().export(skills)
+        File("temp-skills.xml").writeText(xmlSkills)
+        val xsltSkillsResult = XsltExporter().export(xmlSkills, skillsXsltPath)
+        File("temp-skills.html").writeText(xsltSkillsResult)
+        html = html.replace("<!-- XSL-T skills placeholder -->", xsltSkillsResult)
+
+        outputPath.toFile().writeText(html)
+    }
+
+    private fun getSkills(
+        importer: Importer,
+        calculateSkillOrders: Boolean
+    ): List<Skill> {
+        val skillsRaw = importer.skills
             .sortedWith(
                 compareBy<Skill>
                 {
@@ -105,44 +129,51 @@ class Main : CliktCommand() {
 
         val skillComparisons = importer.skillComparisons
 
-        // experimental visualization of skill comparisons
-        val graph = GraphBuilder<Skill>(SkillNodeInformationRetriever(skillComparisons)).build(skills, false)
-        val dot = DotExporter.generate(graph)
-        GraphvizExporter.render(dot, File("skills.svg"), Format.SVG)
-        GraphUtils.findCycles(graph) // TODO: this should stop the whole tool if a cycle was found
+        val skills = if (calculateSkillOrders) {
+            // experimental visualization of skill comparisons
 
-        GraphUtils.populateOrders(graph)
-        // set orders according to scaled orders in graph
-        graph.getVertices().forEach { vertex ->
-            skills.first { skill -> skill == vertex.content }.order = vertex.scaledOrder
+            val graph = GraphBuilder<Skill>(SkillNodeInformationRetriever(skillComparisons)).build(skillsRaw, false)
+            val dot = DotExporter.generate(graph)
+            GraphvizExporter.render(dot, File("skills.svg"), Format.SVG)
+            GraphUtils.findCycles(graph) // TODO: this should stop the whole tool if a cycle was found
+
+            GraphUtils.populateOrders(graph)
+            // set orders according to scaled orders in graph
+            graph.getVertices().forEach { vertex ->
+                skillsRaw.first { skill -> skill == vertex.content }.order = vertex.scaledOrder
+            }
+            graph.getVertices().sortedBy { it.order }.forEach { println("${it.scaledOrder} ${it.text}") }
+
+            val orderedSkills = skillsRaw
+                .sortedWith(
+                    compareBy<Skill>
+                    {
+                        it.category
+                    }
+                        .thenBy { it.subcategory }
+                        .thenByDescending { it.order }
+                        .thenBy { it.label }
+                )
+            orderedSkills
+        } else {
+            skillsRaw
+            // TODO: handle this case in XSL-T
         }
-        graph.getVertices().sortedBy { it.order }.forEach { println("${it.scaledOrder} ${it.text}") }
+        return skills
+    }
 
-        val orderedSkills = skills
+    private fun getPositions(importer: Importer): List<Position> {
+        return importer.positions
             .sortedWith(
-                compareBy<Skill>
+                compareBy<Position>
                 {
-                    it.category
+                    when (it.end) {
+                        null -> LocalDate.now()
+                        else -> it.end
+                    }
                 }
-                    .thenBy { it.subcategory }
-                    .thenByDescending { it.order }
-                    .thenBy { it.label }
-            )
-
-        // produce HTML by serializing XML and converting it via XSL-T
-        val xmlPositions = XmlExporter().export(positions)
-        File("temp-positions.xml").writeText(xmlPositions)
-        val xsltPositionsResult = XsltExporter().export(xmlPositions, positionsXsltPath)
-        File("temp-positions.html").writeText(xsltPositionsResult)
-        html = html.replace("<!-- XSL-T positions placeholder -->", xsltPositionsResult)
-
-        val xmlSkills = XmlExporter().export(orderedSkills)
-        File("temp-skills.xml").writeText(xmlSkills)
-        val xsltSkillsResult = XsltExporter().export(xmlSkills, skillsXsltPath)
-        File("temp-skills.html").writeText(xsltSkillsResult)
-        html = html.replace("<!-- XSL-T skills placeholder -->", xsltSkillsResult)
-
-        outputPath.toFile().writeText(html)
+                    .thenBy { it.begin }
+                    .reversed())
     }
 }
 
