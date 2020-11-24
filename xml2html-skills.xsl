@@ -17,7 +17,13 @@
                             <xsl:attribute name="title">
                                 <xsl:value-of select="./description"/>
                             </xsl:attribute>
-                            <xsl:attribute name="style">background-color: <xsl:value-of select="./hexColor"/>;</xsl:attribute>
+                            <xsl:choose>
+                                <xsl:when test="./hexColor != ''">
+                                    <xsl:attribute name="style">background-color: <xsl:value-of select="./hexColor"/>;</xsl:attribute>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <xsl:value-of select="./label"/>
                           </span>
                       </xsl:for-each>

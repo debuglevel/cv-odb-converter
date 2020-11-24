@@ -15,12 +15,16 @@ data class Skill(
         return label
     }
 
-    val hexColor: String
+    val hexColor: String?
         get() {
-            val x = getTrafficlightColor(order!!)
-            val color = Color(x)
-            val hex = java.lang.String.format("#%02x%02x%02x", color.red, color.green, color.blue)
-            return hex
+            return if (order != null) {
+                val x = getTrafficlightColor(order!!)
+                val color = Color(x)
+                val hex = java.lang.String.format("#%02x%02x%02x", color.red, color.green, color.blue)
+                hex
+            } else {
+                null
+            }
         }
 
     fun getTrafficlightColor(value: Double): Int {
