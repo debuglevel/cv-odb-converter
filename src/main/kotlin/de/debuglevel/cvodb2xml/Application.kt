@@ -23,7 +23,7 @@ import java.io.File
 import java.nio.file.Paths
 import java.time.LocalDate
 
-class Main : CliktCommand() {
+class Application : CliktCommand() {
     private val logger = KotlinLogging.logger {}
 
     private val odbPath by argument("odb", help = "Path to ODB database file").path(
@@ -178,5 +178,5 @@ class Main : CliktCommand() {
 }
 
 fun main(args: Array<String>) {
-    Main().main(args)
+    Application().main(args)
 }
