@@ -58,9 +58,6 @@ repositories {
     jcenter()
     //mavenLocal()
     maven {
-        url "https://dl.bintray.com/debuglevel/maven"
-    }
-    maven {
         url 'https://jitpack.io'
         metadataSources { // TODO: remove this as soon as a release of java-graph-library exists
             artifact() // workaround to specify git hash as jitpack version
@@ -152,7 +149,7 @@ dependencies {
     //implementation "io.micronaut.views:micronaut-views-soy"
 
     // JDBC driver for ODB files
-    implementation 'de.debuglevel.odbjdbc:odbjdbc:0.0.1'
+    implementation 'com.github.debuglevel:odb-jdbc:e1cda302cb'
 
     //compile group: 'org.hsqldb', name: 'hsqldb', version: '2.4.1'
 
