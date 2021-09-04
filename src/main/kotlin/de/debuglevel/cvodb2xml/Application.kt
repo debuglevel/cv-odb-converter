@@ -61,7 +61,7 @@ class Application : CliktCommand() {
         readable = true
     ).default(Paths.get("data/transformation/replacement-template.html"))
 
-    private val outputPath by option("--output", help = "Path to output file").path(
+    private val htmlOutputPath by option("--html-output", help = "Path to output file").path(
         exists = false,
         fileOkay = true,
         folderOkay = false,
@@ -102,7 +102,7 @@ class Application : CliktCommand() {
         File("data/output/temp-skills.html").writeText(xsltSkillsResult)
         html = html.replace("<!-- XSL-T skills placeholder -->", xsltSkillsResult)
 
-        outputPath.toFile().writeText(html)
+        htmlOutputPath.toFile().writeText(html)
     }
 
     private fun getSkills(
