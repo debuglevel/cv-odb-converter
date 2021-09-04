@@ -6,13 +6,13 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
-import de.debuglevel.cvodb2xml.export.xml.XmlExporter
-import de.debuglevel.cvodb2xml.export.xslt.XsltExporter
 import de.debuglevel.cvodb2xml.graph.SkillNodeInformationRetriever
 import de.debuglevel.cvodb2xml.import.Importer
 import de.debuglevel.cvodb2xml.import.odb.OdbImporter
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
+import de.debuglevel.cvodb2xml.writers.HtmlWriter
+import de.debuglevel.cvodb2xml.writers.XmlWriter
 import de.debuglevel.graphlibrary.GraphBuilder
 import de.debuglevel.graphlibrary.GraphUtils
 import de.debuglevel.graphlibrary.export.DotExporter
@@ -69,6 +69,14 @@ class Application : CliktCommand() {
         readable = false
     ).default(Paths.get("data/output/index.html"))
 
+    private val outputPath by option("--output-directory", help = "Path to output directory").path(
+        exists = false,
+        fileOkay = false,
+        folderOkay = true,
+        writable = true,
+        readable = false
+    ).default(Paths.get("data/output/"))
+
     private val calculateSkillOrders by option(
         "--calculate-skill-orders",
         help = "Calculate skill orders defined by skill comparisons"
@@ -80,29 +88,15 @@ class Application : CliktCommand() {
         val positions = getPositions(importer)
         val skills = getSkills(importer, calculateSkillOrders)
 
-        generateHtml(positions, skills)
+        generate(positions, skills)
     }
 
-    private fun generateHtml(
+    private fun generate(
         positions: List<Position>,
         skills: List<Skill>
     ) {
-        // produce HTML by serializing XML and converting it via XSL-T
-        var html = templatePath.toFile().readText()
-
-        val xmlPositions = XmlExporter().export(positions)
-        File("data/output/temp-positions.xml").writeText(xmlPositions)
-        val xsltPositionsResult = XsltExporter().export(xmlPositions, positionsXsltPath)
-        File("data/output/temp-positions.html").writeText(xsltPositionsResult)
-        html = html.replace("<!-- XSL-T positions placeholder -->", xsltPositionsResult)
-
-        val xmlSkills = XmlExporter().export(skills)
-        File("data/output/temp-skills.xml").writeText(xmlSkills)
-        val xsltSkillsResult = XsltExporter().export(xmlSkills, skillsXsltPath)
-        File("data/output/temp-skills.html").writeText(xsltSkillsResult)
-        html = html.replace("<!-- XSL-T skills placeholder -->", xsltSkillsResult)
-
-        htmlOutputPath.toFile().writeText(html)
+        XmlWriter.write(positions, skills, outputPath)
+        HtmlWriter.write(positions, skills, htmlOutputPath, templatePath, positionsXsltPath, skillsXsltPath)
     }
 
     private fun getSkills(
