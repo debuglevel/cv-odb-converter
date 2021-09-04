@@ -12,6 +12,7 @@ import de.debuglevel.cvodb2xml.import.odb.OdbImporter
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
 import de.debuglevel.cvodb2xml.writers.HtmlWriter
+import de.debuglevel.cvodb2xml.writers.JsonWriter
 import de.debuglevel.cvodb2xml.writers.XmlWriter
 import de.debuglevel.graphlibrary.GraphBuilder
 import de.debuglevel.graphlibrary.GraphUtils
@@ -95,6 +96,7 @@ class Application : CliktCommand() {
         positions: List<Position>,
         skills: List<Skill>
     ) {
+        JsonWriter.write(positions, skills, outputPath)
         XmlWriter.write(positions, skills, outputPath)
         HtmlWriter.write(positions, skills, htmlOutputPath, templatePath, positionsXsltPath, skillsXsltPath)
     }

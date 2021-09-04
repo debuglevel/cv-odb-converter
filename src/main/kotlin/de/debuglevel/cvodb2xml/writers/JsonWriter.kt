@@ -1,11 +1,11 @@
 package de.debuglevel.cvodb2xml.writers
 
-import de.debuglevel.cvodb2xml.export.xml.XmlExporter
+import de.debuglevel.cvodb2xml.export.json.JsonExporter
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
 import java.nio.file.Path
 
-object XmlWriter {
+object JsonWriter {
     fun write(
         positions: List<Position>,
         skills: List<Skill>,
@@ -19,15 +19,15 @@ object XmlWriter {
         skills: List<Skill>,
         outputPath: Path
     ) {
-        val xmlSkills = XmlExporter().export(skills)
-        outputPath.resolve("skills.xml").toFile().writeText(xmlSkills)
+        val jsonSkills = JsonExporter().export(skills)
+        outputPath.resolve("skills.json").toFile().writeText(jsonSkills)
     }
 
     private fun writePositions(
         positions: List<Position>,
         outputPath: Path
     ) {
-        val xmlPositions = XmlExporter().export(positions)
-        outputPath.resolve("positions.xml").toFile().writeText(xmlPositions)
+        val jsonPositions = JsonExporter().export(positions)
+        outputPath.resolve("positions.json").toFile().writeText(jsonPositions)
     }
 }
