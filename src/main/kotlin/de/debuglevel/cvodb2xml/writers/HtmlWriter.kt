@@ -4,15 +4,20 @@ import de.debuglevel.cvodb2xml.export.xml.XmlExporter
 import de.debuglevel.cvodb2xml.export.xslt.XsltExporter
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
+import mu.KotlinLogging
 import java.nio.file.Path
 
 object HtmlWriter {
+    private val logger = KotlinLogging.logger {}
+
     fun write(
         positions: List<Position>,
         skills: List<Skill>,
         outputPath: Path,
         transformationPath: Path,
     ) {
+        logger.debug { "Writing..." }
+
         // produce HTML by serializing XML and converting it via XSL-T
         var html = transformationPath.resolve("replacement-template.html").toFile().readText()
 

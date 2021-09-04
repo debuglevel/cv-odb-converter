@@ -3,14 +3,19 @@ package de.debuglevel.cvodb2xml.writers
 import de.debuglevel.cvodb2xml.export.xml.XmlExporter
 import de.debuglevel.cvodb2xml.model.Position
 import de.debuglevel.cvodb2xml.model.Skill
+import mu.KotlinLogging
 import java.nio.file.Path
 
 object XmlWriter {
+    private val logger = KotlinLogging.logger {}
+
     fun write(
         positions: List<Position>,
         skills: List<Skill>,
         outputPath: Path,
     ) {
+        logger.debug { "Writing..." }
+
         writePositions(positions, outputPath)
         writeSkills(skills, outputPath)
     }
