@@ -67,13 +67,13 @@ class OdbImporter(private val odbPath: Path) : Importer {
                 resultset.close()
                 statement.close()
             } catch (e: SQLException) {
-                logger.error(e) { }
+                logger.error(e) { "Error handling database" }
                 throw e
             } finally {
                 try {
                     connection?.close()
                 } catch (e: SQLException) {
-                    logger.error(e) { }
+                    logger.error(e) { "Error handling database" }
                     throw e
                 }
             }
@@ -116,13 +116,13 @@ class OdbImporter(private val odbPath: Path) : Importer {
                 resultset.close()
                 statement.close()
             } catch (e: SQLException) {
-                logger.error(e) { }
+                logger.error(e) { "Error handling database" }
                 throw e
             } finally {
                 try {
                     connection?.close()
                 } catch (e: SQLException) {
-                    logger.error(e) { }
+                    logger.error(e) { "Error handling database" }
                     throw e
                 }
             }
@@ -167,13 +167,13 @@ class OdbImporter(private val odbPath: Path) : Importer {
                 resultset.close()
                 statement.close()
             } catch (e: SQLException) {
-                logger.error(e) { }
+                logger.error(e) { "Error handling database" }
                 throw e
             } finally {
                 try {
                     connection?.close()
                 } catch (e: SQLException) {
-                    logger.error(e) { }
+                    logger.error(e) { "Error handling database" }
                     throw e
                 }
             }

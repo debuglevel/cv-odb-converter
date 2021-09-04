@@ -35,43 +35,19 @@ class Application : CliktCommand() {
         readable = true
     )
 
-    private val positionsXsltPath by option(
-        "--positions-xslt",
-        help = "Path to XSL-T stylesheet file for positions"
+    private val transformationPath by option(
+        "--transformation-directory",
+        help = "Path to transformation directory"
     ).path(
         exists = true,
-        fileOkay = true,
-        folderOkay = false,
-        writable = false,
-        readable = true
-    ).default(Paths.get("data/transformation/xml2html-positions.xsl"))
-
-    private val skillsXsltPath by option("--skills-xslt", help = "Path to XSL-T stylesheet file for skills").path(
-        exists = true,
-        fileOkay = true,
-        folderOkay = false,
-        writable = false,
-        readable = true
-    ).default(Paths.get("data/transformation/xml2html-skills.xsl"))
-
-    private val templatePath by option("--template", help = "Path to template file").path(
-        exists = true,
-        fileOkay = true,
-        folderOkay = false,
-        writable = false,
-        readable = true
-    ).default(Paths.get("data/transformation/replacement-template.html"))
-
-    private val htmlOutputPath by option("--html-output", help = "Path to output file").path(
-        exists = false,
-        fileOkay = true,
-        folderOkay = false,
+        fileOkay = false,
+        folderOkay = true,
         writable = true,
         readable = false
-    ).default(Paths.get("data/output/index.html"))
+    ).default(Paths.get("data/transformation/"))
 
     private val outputPath by option("--output-directory", help = "Path to output directory").path(
-        exists = false,
+        exists = true,
         fileOkay = false,
         folderOkay = true,
         writable = true,
@@ -98,7 +74,7 @@ class Application : CliktCommand() {
     ) {
         JsonWriter.write(positions, skills, outputPath)
         XmlWriter.write(positions, skills, outputPath)
-        HtmlWriter.write(positions, skills, htmlOutputPath, templatePath, positionsXsltPath, skillsXsltPath)
+        HtmlWriter.write(positions, skills, outputPath, transformationPath)
     }
 
     private fun getSkills(
