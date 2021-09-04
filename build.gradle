@@ -149,7 +149,8 @@ dependencies {
     //implementation "io.micronaut.views:micronaut-views-soy"
 
     // JDBC driver for ODB files
-    implementation 'com.github.debuglevel:odb-jdbc:e1cda302cb'
+    implementation 'com.github.debuglevel:odb-jdbc:3bcfc45132'
+    implementation group: 'org.hsqldb', name: 'hsqldb', version: '2.4.1' // because odb-jdbc is no fat jar yet
 
     //compile group: 'org.hsqldb', name: 'hsqldb', version: '2.4.1'
 
