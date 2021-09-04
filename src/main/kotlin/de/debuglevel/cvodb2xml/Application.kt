@@ -43,7 +43,7 @@ class Application : CliktCommand() {
         folderOkay = false,
         writable = false,
         readable = true
-    ).default(Paths.get("xml2html-positions.xsl"))
+    ).default(Paths.get("data/transformation/xml2html-positions.xsl"))
 
     private val skillsXsltPath by option("--skills-xslt", help = "Path to XSL-T stylesheet file for skills").path(
         exists = true,
@@ -51,7 +51,7 @@ class Application : CliktCommand() {
         folderOkay = false,
         writable = false,
         readable = true
-    ).default(Paths.get("xml2html-skills.xsl"))
+    ).default(Paths.get("data/transformation/xml2html-skills.xsl"))
 
     private val templatePath by option("--template", help = "Path to template file").path(
         exists = true,
@@ -59,7 +59,7 @@ class Application : CliktCommand() {
         folderOkay = false,
         writable = false,
         readable = true
-    ).default(Paths.get("replacement-template.html"))
+    ).default(Paths.get("data/transformation/replacement-template.html"))
 
     private val outputPath by option("--output", help = "Path to output file").path(
         exists = false,
@@ -67,7 +67,7 @@ class Application : CliktCommand() {
         folderOkay = false,
         writable = true,
         readable = false
-    ).default(Paths.get("index.html"))
+    ).default(Paths.get("data/output/index.html"))
 
     private val calculateSkillOrders by option(
         "--calculate-skill-orders",
@@ -91,15 +91,15 @@ class Application : CliktCommand() {
         var html = templatePath.toFile().readText()
 
         val xmlPositions = XmlExporter().export(positions)
-        File("temp-positions.xml").writeText(xmlPositions)
+        File("data/output/temp-positions.xml").writeText(xmlPositions)
         val xsltPositionsResult = XsltExporter().export(xmlPositions, positionsXsltPath)
-        File("temp-positions.html").writeText(xsltPositionsResult)
+        File("data/output/temp-positions.html").writeText(xsltPositionsResult)
         html = html.replace("<!-- XSL-T positions placeholder -->", xsltPositionsResult)
 
         val xmlSkills = XmlExporter().export(skills)
-        File("temp-skills.xml").writeText(xmlSkills)
+        File("data/output/temp-skills.xml").writeText(xmlSkills)
         val xsltSkillsResult = XsltExporter().export(xmlSkills, skillsXsltPath)
-        File("temp-skills.html").writeText(xsltSkillsResult)
+        File("data/output/temp-skills.html").writeText(xsltSkillsResult)
         html = html.replace("<!-- XSL-T skills placeholder -->", xsltSkillsResult)
 
         outputPath.toFile().writeText(html)
@@ -134,7 +134,7 @@ class Application : CliktCommand() {
 
             val graph = GraphBuilder<Skill>(SkillNodeInformationRetriever(skillComparisons)).build(skillsRaw, false)
             val dot = DotExporter.generate(graph)
-            GraphvizExporter.render(dot, File("skills.svg"), Format.SVG)
+            GraphvizExporter.render(dot, File("data/output/skills.svg"), Format.SVG)
             GraphUtils.findCycles(graph) // TODO: this should stop the whole tool if a cycle was found
 
             GraphUtils.populateOrders(graph)
